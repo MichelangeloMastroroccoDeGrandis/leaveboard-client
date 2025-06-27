@@ -1,0 +1,72 @@
+.sidebar {
+  transition: transform 0.3s ease-in-out;
+  width: 20vw;
+}
+
+.sidebarMobile {
+  transition: transform 0.3s ease-in-out;
+  width: 20vw;
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  margin-top: 50px;
+  background-color: var(--white);
+  z-index: 1;
+}
+
+
+/* Closed on mobile */
+.closed {
+  transform: translateX(-20vw);
+}
+
+/* Open on mobile */
+.open {
+  transform: translateX(0);
+}
+
+.hamburger {
+  position: fixed;
+  top: 20px;
+  left: 10px;
+  z-index: 50;
+  background: none;
+  border: none;
+  font-size: 16px;
+  color: #111;
+}
+
+.sidebarList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.link {
+  display: block;
+  padding: 0.5em 16px;
+  color: var(--grey-dark);
+  text-decoration: none;
+  font-family: 'Bebas Neue', sans-serif;
+  transition: 0.2s ease;
+}
+
+.link:hover {
+  color: var(--green);
+}
+
+.link.active {
+  background-color: var(--green);
+  color: white;
+}
+
+.logout {
+  display: block;
+    background-color: var(--red);
+    color: var(--white);
+    font-family: 'Bebas Neue', sans-serif;
+    border: none;
+    font-weight: 100;
+    padding: .5em 1em;
+    width: inherit;
+}

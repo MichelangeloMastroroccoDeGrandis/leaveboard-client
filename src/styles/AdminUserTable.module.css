@@ -1,0 +1,20 @@
+.deleteButton {
+    background-color: var(--red);
+    color: var(--white);
+    border: none;
+    padding: 0.3em 1em;
+    border-radius: 4px;
+}
+
+.updatePassword {
+    background-color: var(--green);
+    color: var(--white);
+    border: none;
+    padding: 0.3em 1em;
+    margin: 8px 0;
+    border-radius: 4px;
+}   
+
+.TableContainer {
+overflow-x: auto;
+}

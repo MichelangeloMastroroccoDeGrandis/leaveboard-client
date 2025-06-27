@@ -1,0 +1,44 @@
+.wfhRequestForm {
+  display: flex;
+  flex-direction: column;
+  align-items: LEFT;
+  background-color: var(--grey-light);
+}
+
+.wfhRequestForm * {
+  margin-bottom: 16px;
+}
+
+.wfhRequestForm h3 {
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.wfhRequestForm label {
+  font-size: 12px;
+}
+
+.wfhRequestForm input[type="date"] {
+  padding: 10px;
+  border: 1px solid #ccc;
+}
+
+.wfhRequestForm select {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.wfhRequestForm button[type="submit"] {
+  padding: 10px 20px;
+  background-color: var(--green);
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.wfhRequestForm p {
+  color: #666;
+  margin-top: 10px;
+}

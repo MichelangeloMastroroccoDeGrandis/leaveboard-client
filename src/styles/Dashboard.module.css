@@ -1,0 +1,47 @@
+.dashboard {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.dashboardMobile {
+    display: block;
+    width: 100%;
+}
+
+.sideBar {
+    display: flex;
+    flex-direction: column;
+    width: 20vw;
+    height: 100vh;
+    background-color: #f0f0f0;
+}
+
+.sideBarMobile {
+    display: block;
+    position: relative;
+    top: 0;
+    width: 20vw;
+    height: 100vh;
+    background-color: #f0f0f0;
+    z-index: 1;
+}
+
+.mainContent {
+    display: flex;
+    flex-direction: column;
+    width: 80vw;
+    height: 100vh;
+    background-color: #ffffff;
+}
+
+.mainContentMobile {
+    display: block;
+    position: fixed;
+    top: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: #ffffff;
+}
