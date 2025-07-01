@@ -10,11 +10,13 @@ import MyAccount from './pages/MyAccount';
 import Company from './pages/Company';
 import ForgotPassword from './pages/ForgotPassword';
 import NotFound from './pages/NotFound';
+import AuthChecker from './hooks/authChecker';
 
 function App() {
 
   return (
     <>
+      <AuthChecker />
       <Routes>
         <Route path="/login" element={<LoginPage />} />
 

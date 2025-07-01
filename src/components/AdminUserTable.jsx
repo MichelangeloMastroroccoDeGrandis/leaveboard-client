@@ -8,13 +8,15 @@ const AdminUserTable = ({ users, refreshUsers }) => {
   const [passwords, setPasswords] = useState({});
   const token = localStorage.getItem('token');
 
+  const url = import.meta.env.VITE_API_URL;
+
   const handleDelete = async (id, e) => {
      if (e) e.preventDefault();
 
     const confirmed = window.confirm('Are you sure you want to delete this user?');
     if (!confirmed) return;
 
-    await fetch(`http://localhost:5000/api/admin/users/${id}`, {
+    await fetch(`${url}/api/admin/users/${id}`, {
       method: 'DELETE',
       headers: { Authorization: `Bearer ${token}` },
     });
@@ -32,7 +34,7 @@ const AdminUserTable = ({ users, refreshUsers }) => {
       return;
     }
 
-    const res = await fetch(`http://localhost:5000/api/admin/users/${id}/password`, {
+    const res = await fetch(`${url}/api/admin/users/${id}/password`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',

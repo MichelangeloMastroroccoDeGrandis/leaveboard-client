@@ -69,4 +69,5 @@
     font-weight: 100;
     padding: .5em 1em;
     width: inherit;
+    cursor: pointer;
 }

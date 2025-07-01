@@ -1,14 +1,18 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { FaBars } from 'react-icons/fa';
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { Link, useLocation } from 'react-router-dom';
 import styles from '../styles/SideBar.module.css';
 import { isMobile } from 'react-device-detect';
+import { logout } from '../features/auth/authSlice';
+
 
 const SideBar = () => {
   const { user } = useSelector((state) => state.auth);
   const location = useLocation();
   const [isOpen, setIsOpen] = useState(false);
+  const dispatch = useDispatch();
+
 
   const handleLogout = () => {
       dispatch(logout());

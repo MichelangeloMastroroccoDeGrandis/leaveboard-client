@@ -15,6 +15,7 @@
     "@reduxjs/toolkit": "^2.8.2",
     "axios": "^1.9.0",
     "helmet": "^8.1.0",
+    "jwt-decode": "^4.0.0",
     "react": "^19.1.0",
     "react-device-detect": "^2.2.3",
     "react-dom": "^19.1.0",
