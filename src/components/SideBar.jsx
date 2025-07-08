@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { FaBars } from 'react-icons/fa';
 import { useSelector, useDispatch } from "react-redux";
 import { Link, useLocation } from 'react-router-dom';
-import styles from '../styles/SideBar.module.css';
+import styles from '../styles/Sidebar.module.css';
 import { isMobile } from 'react-device-detect';
 import { logout } from '../features/auth/authSlice';
 
