@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useSelector } from 'react-redux';
 import SectionWrap from './SectionWrap';
-import styles from '../styles/WfHRequestForm.module.css';
+import styles from '../styles/WfhRequestForm.module.css';
 
 const WfhRequestForm = () => {
   const [type, setType] = useState('wfh');
