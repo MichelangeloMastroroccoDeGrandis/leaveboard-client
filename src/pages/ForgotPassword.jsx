@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import logo from '../assets/logo_no_text.png';
+import logo from '../assets/Logo_no_text.png';
 import styles from '../styles/LoginPage.module.css'; 
 
 const ForgotPassword = () => {
