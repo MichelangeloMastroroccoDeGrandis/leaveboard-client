@@ -4,7 +4,7 @@ import axios from 'axios';
 import { loginStart, loginSuccess, loginFailure } from '../features/auth/authSlice';
 import { useNavigate } from 'react-router-dom';
 import styles from "../styles/LoginPage.module.css";
-import logo from '../assets/logo_no_text.png';
+import logo from '../assets/Logo_no_text.png';
 
 const LoginPage = () => {
   const dispatch = useDispatch();
