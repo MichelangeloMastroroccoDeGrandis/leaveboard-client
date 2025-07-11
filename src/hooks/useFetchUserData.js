@@ -11,9 +11,11 @@ const useFetchUserData = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  const url = `${import.meta.env.VITE_BASE_URL}/api/dashboard`;
+
   useEffect(() => {
     const fetchWithToken = async (tokenToUse) => {
-      const res = await fetch('http://localhost:5000/api/dashboard', {
+      const res = await fetch(url, {
         headers: {
           Authorization: `Bearer ${tokenToUse}`,
         },

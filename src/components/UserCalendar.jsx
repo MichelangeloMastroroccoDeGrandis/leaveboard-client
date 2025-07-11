@@ -32,9 +32,11 @@ const UserCalendar = () => {
 
   const dates = getDates();
 
+  const url = `${import.meta.env.VITE_BASE_URL}/api/calendar`;
+
   useEffect(() => {
   const fetchData = async () => {
-    const res = await fetch('http://localhost:5000/api/calendar', {
+    const res = await fetch(url, {
       headers: { Authorization: `Bearer ${token}` },
     });
     const data = await res.json();

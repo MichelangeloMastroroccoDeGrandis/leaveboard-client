@@ -2,7 +2,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 
-const API = 'http://localhost:5000/api/wfh';
+const API = `${process.env.VITE_BASE_URL}/api/wfh`; 
 
 const fetchPendingRequests = createAsyncThunk(
   'approvals/fetchPending',
@@ -88,5 +88,5 @@ export default approvalsSlice.reducer;
 export {
   fetchPendingRequests,
   approveRequest,
-  rejectRequest,  // only export once here
+  rejectRequest,  
 };

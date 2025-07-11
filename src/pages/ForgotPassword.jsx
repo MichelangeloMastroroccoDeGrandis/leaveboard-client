@@ -6,11 +6,13 @@ const ForgotPassword = () => {
   const [email, setEmail] = useState('');
   const [status, setStatus] = useState('');
 
+  const url = `${import.meta.env.VITE_BASE_URL}/api/auth/recover`;
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setStatus('Sending...');
 
-    const res = await fetch('http://localhost:5000/api/auth/recover', {
+    const res = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email }),

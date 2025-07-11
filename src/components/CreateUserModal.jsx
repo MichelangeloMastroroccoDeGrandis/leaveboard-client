@@ -53,8 +53,10 @@ const CreateUserModal = ({ isOpen, onClose, onUserCreated, token }) => {
       return;
     }
 
+    const url = `${import.meta.env.VITE_BASE_URL}/api/auth/register`;
+
         try {
-            await axios.post('http://localhost:5000/api/auth/register', formData, { 
+            await axios.post(url, formData, { 
                 headers: {Authorization: `Bearer ${token}` }
             });
             onUserCreated(); // Notify parent component

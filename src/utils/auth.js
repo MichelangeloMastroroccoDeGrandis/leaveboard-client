@@ -1,6 +1,8 @@
 export const refreshToken = async () => {
+
+  const url = `${import.meta.env.VITE_BASE_URL}/api/auth/refresh`;
   try {
-    const res = await fetch('http://localhost:5000/api/auth/refresh', {
+    const res = await fetch(url, {
       method: 'POST',
       credentials: 'include', // include cookie in request
     });

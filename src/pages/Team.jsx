@@ -10,9 +10,11 @@ const Team = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [users, setUsers] = useState([]);
 
+    const url = `${import.meta.env.VITE_BASE_URL}/api/admin/users`;
+
     const fetchUsers = async () => {
     try {
-      const res = await fetch('http://localhost:5000/api/admin/users', {
+      const res = await fetch(url, {
         headers: { Authorization: `Bearer ${token}` },
       });
 

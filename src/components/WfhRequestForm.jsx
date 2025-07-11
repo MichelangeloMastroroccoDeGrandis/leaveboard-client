@@ -12,6 +12,8 @@ const WfhRequestForm = () => {
   const [message, setMessage] = useState(null);
   const { token } = useSelector(state => state.auth);
 
+  const url = `${import.meta.env.VITE_BASE_URL}/api/wfh/request`;
+
   useEffect(() => {
   if (type === 'sick' && Array.isArray(date)) {
     const diff = (new Date(date[1]) - new Date(date[0])) / (1000 * 60 * 60 * 24) + 1;
@@ -29,7 +31,7 @@ const WfhRequestForm = () => {
         ? { type, startDate, endDate }
         : { type, date };
 
-    const res = await axios.post('http://localhost:5000/api/wfh/request', payload, {
+    const res = await axios.post(url, payload, {
       headers: { Authorization: `Bearer ${token}` }
     });
 

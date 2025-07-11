@@ -16,6 +16,8 @@ const LoginPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
+  const url = `${import.meta.env.VITE_BASE_URL}/api/auth/login`;
+
 
   // ✅ Redirect after successful login
   useEffect(() => {
@@ -29,7 +31,7 @@ const LoginPage = () => {
     dispatch(loginStart());
 
     try {
-      const res = await axios.post('http://localhost:5000/api/auth/login', { email, password });
+      const res = await axios.post(url, { email, password });
       dispatch(loginSuccess(res.data));
     } catch (err) {
       dispatch(loginFailure('Invalid credentials'));
