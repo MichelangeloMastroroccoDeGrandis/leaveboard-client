@@ -2,7 +2,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 
-const API = `${process.env.VITE_BASE_URL}/api/wfh`; 
+const API = `${import.meta.env.VITE_BASE_URL}/api/wfh`; 
 
 const fetchPendingRequests = createAsyncThunk(
   'approvals/fetchPending',

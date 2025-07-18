@@ -8,7 +8,7 @@ const AdminUserTable = ({ users, refreshUsers }) => {
   const [passwords, setPasswords] = useState({});
   const token = localStorage.getItem('token');
 
-  const url = import.meta.env.VITE_API_URL;
+  const url = import.meta.env.VITE_BASE_URL;
 
   const handleDelete = async (id, e) => {
      if (e) e.preventDefault();
