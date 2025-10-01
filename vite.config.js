@@ -9,5 +9,13 @@ export default defineConfig({
   },
   build: {
     outDir: 'dist',
+  },
+  optimizeDeps: {
+    exclude: ["crypto"], // prevent vite from polyfilling browser crypto
+  },
+  resolve: {
+    alias: {
+      crypto: "crypto" // ensure it uses Node’s crypto
+    }
   }
 })
