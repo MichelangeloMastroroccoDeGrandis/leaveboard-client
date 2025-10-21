@@ -10,7 +10,9 @@ import SectionWrap from "../components/SectionWrap";
 import ApprovalCard from "../components/ApprovalCard";
 import styles from '../styles/MainPage.module.css';
 
+
 const Approvals = () => {
+  const user = useSelector((state) => state.auth.user);
   const dispatch = useDispatch();
   const { requests, loading, error } = useSelector((state) => state.approvals);
 
@@ -42,16 +44,19 @@ const Approvals = () => {
         {loading && <p>Loading...</p>}
         {error && <p>{error}</p>}
         {requests.length === 0 && <p>No pending requests.</p>}
+        
         <ul>
-          {requests.map((r) => (
-            <SectionWrap type="approval" key={r._id}>
-              <ApprovalCard
-                request={r}
-                onApprove={handleApprove}
-                onReject={handleReject}
-              />
-            </SectionWrap>
-          ))}
+          {requests.map((r) =>
+            r.user.role === user.role ? null : (
+              <SectionWrap type="approval" key={r._id}>
+                <ApprovalCard
+                  request={r}
+                  onApprove={handleApprove}
+                  onReject={handleReject}
+                />
+              </SectionWrap>
+            )
+          )}
         </ul>
       </div>
     </Wrapper>
