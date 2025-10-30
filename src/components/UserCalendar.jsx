@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
 import styles from '../styles/UserCalendar.module.css';
 
-const UserCalendar = () => {
+const UserCalendar = ({ refreshKey = 0 }) => {
   const [users, setUsers] = useState([]);
   const [requests, setRequests] = useState([]);
   const token = localStorage.getItem('token');
 
-  // Compute 2 weeks
+  // Compute 4 weeks
   const getDates = () => {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -19,7 +19,7 @@ const UserCalendar = () => {
 
   let sundayCount = 0;
 
-  while (sundayCount < 2) {
+  while (sundayCount < 4) {
     if (currentDate.getDay() === 0) {
       sundayCount++;
     }
@@ -44,7 +44,7 @@ const UserCalendar = () => {
     setRequests(data.requests);
   };
   fetchData();
-}, []);
+}, [url, token, refreshKey]);
 
   const formatDate = (d) => d.toLocaleDateString('en-CA', { timeZone: 'Asia/Bangkok' });
 
@@ -56,15 +56,21 @@ const UserCalendar = () => {
     if (date.getDay() === 0 || date.getDay() === 6 || date.getDay() === 5) return <td key={key} className={styles.weekend}></td>;
 
     const req = requests.find(
-      (r) => r.user._id === userId && formatDate(new Date(r.date)) === dayStr
+      (r) => r?.user?._id === userId && formatDate(new Date(r.date)) === dayStr
     );
     if (!req) return <td key={key}></td>;
 
-    const type = req.type.toLowerCase();
-    const label = req.type.toUpperCase();
+    const type = String(req.type).toLowerCase();
+    const label = String(req.type).toUpperCase();
+
+    // Highlight pending WFH in yellow
+    if (req.status === 'pending' && type === 'wfh') {
+      return <td key={key} className={styles.pending}>{label}</td>;
+    }
 
     return <td key={key} className={styles[type]}>{label}</td>;
   }
+console.log(requests)
 
   return (
     <div className={styles.container}>
@@ -75,7 +81,7 @@ const UserCalendar = () => {
             <th >Name</th>
             {dates.map((date) => (
               <th key={date} >
-                {date.toLocaleDateString(undefined, { weekday: 'short', day: 'numeric' })}
+                {date.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' })}
               </th>
             ))}
           </tr>

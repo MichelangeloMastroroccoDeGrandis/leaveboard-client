@@ -1,5 +1,4 @@
 .container {
-  max-width: 1000px;
   background-color: var(--white);
   overflow-x: auto;
 }
@@ -21,6 +20,7 @@ th, td {
   padding: 10px;
   border: 1px solid var(--grey-dark);
 }
+
 
 th {
   background-color: var(--blue);
@@ -53,6 +53,12 @@ tr:hover td {
 .timeoff {
   background-color: var(--blue) !important;
   color: var(--white);
+}
+
+.pending {
+  background-color: var(--yellow) !important; /* yellow */
+  color: var(--dark-grey-text); /* dark text for contrast */
+  font-weight: 600;
 }
 
 .weekend {

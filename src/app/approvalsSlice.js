@@ -19,6 +19,23 @@ const fetchPendingRequests = createAsyncThunk(
   }
 );
 
+const fetchApprovedRequests = createAsyncThunk(
+  'approvals/fetchApproved',
+  async (_, thunkAPI) => {
+    try {
+      const token = localStorage.getItem('token');
+      const res = await axios.get(`${API}/approved`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      console.log('Approved requests response:', res.data);
+      return res.data;
+    } catch (err) {
+      console.error('Error fetching approved requests:', err.response?.data || err.message);
+      return thunkAPI.rejectWithValue(err.response?.data || err.message);
+    }
+  }
+);
+
 const approveRequest = createAsyncThunk(
   'approvals/approve',
   async (id, thunkAPI) => {
@@ -54,6 +71,7 @@ const approvalsSlice = createSlice({
   name: 'approvals',
   initialState: {
     requests: [],
+    approvedRequests: [],
     loading: false,
     error: null,
   },
@@ -77,6 +95,18 @@ const approvalsSlice = createSlice({
       })
       .addCase(rejectRequest.fulfilled, (state, action) => {
         state.requests = state.requests.filter(r => r._id !== action.payload.id);
+      })
+      .addCase(fetchApprovedRequests.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchApprovedRequests.fulfilled, (state, action) => {
+        state.loading = false;
+        state.approvedRequests = action.payload;
+      })
+      .addCase(fetchApprovedRequests.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload?.message || 'Failed to fetch approved requests';
       });
   },
 });
@@ -87,6 +117,7 @@ export default approvalsSlice.reducer;
 // ✅ Named exports
 export {
   fetchPendingRequests,
+  fetchApprovedRequests,
   approveRequest,
   rejectRequest,  
 };

@@ -1,5 +1,5 @@
 import Wrapper from "../components/Wrapper";
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   fetchPendingRequests,
@@ -15,25 +15,42 @@ const Approvals = () => {
   const user = useSelector((state) => state.auth.user);
   const dispatch = useDispatch();
   const { requests, loading, error } = useSelector((state) => state.approvals);
+  const [list, setList] = useState([]);
 
   useEffect(() => {
     dispatch(fetchPendingRequests());
   }, [dispatch]);
 
+  useEffect(() => {
+    setList(requests);
+  }, [requests]);
+
   const handleApprove = (id) => {
     if (window.confirm('Approve this request?')) {
+      // Optimistically remove from UI
+      setList((prev) => prev.filter((r) => r._id !== id));
       dispatch(approveRequest(id))
         .unwrap()
-        .catch(console.error);
+        .catch((err) => {
+          console.error(err);
+          // Restore by refetching if server fails
+          dispatch(fetchPendingRequests());
+        });
     }
   };
 
   const handleReject = (id) => {
     const reason = window.prompt('Reason for rejection:');
     if (reason !== null) {
+      // Optimistically remove from UI
+      setList((prev) => prev.filter((r) => r._id !== id));
       dispatch(rejectRequest({ id, reason }))
         .unwrap()
-        .catch(console.error);
+        .catch((err) => {
+          console.error(err);
+          // Restore by refetching if server fails
+          dispatch(fetchPendingRequests());
+        });
     }
   };
 
@@ -43,10 +60,10 @@ const Approvals = () => {
         <h1>Pending WFH Requests</h1>
         {loading && <p>Loading...</p>}
         {error && <p>{error}</p>}
-        {requests.length === 0 && <p>No pending requests.</p>}
+        {list.length === 0 && <p>No pending requests.</p>}
         
         <ul>
-          {requests.map((r) =>
+          {list.map((r) =>
             r.user.role === user.role ? null : (
               <SectionWrap type="approval" key={r._id}>
                 <ApprovalCard
@@ -62,5 +79,6 @@ const Approvals = () => {
     </Wrapper>
   );
 };
+
 
 export default Approvals;
