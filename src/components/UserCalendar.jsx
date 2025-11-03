@@ -70,7 +70,7 @@ const UserCalendar = ({ refreshKey = 0 }) => {
 
     return <td key={key} className={styles[type]}>{label}</td>;
   }
-console.log(requests)
+
 
   return (
     <div className={styles.container}>
