@@ -64,15 +64,14 @@ const WfhRequestForm = ({ onSubmitted }) => {
       const { start, end } = getWeekBounds(date);
       const userId = user._id || user.id;
       const maxDays = user.wfhWeekly || 1;
-      const all = [...approved, ...pending];
-      const count = all.filter((r) => {
+      const approvedCount = approved.filter((r) => {
         if (!r || !r.user) return false;
         const rid = r.user._id || r.user.id;
         if (rid !== userId) return false;
         const rd = new Date(r.date);
         return rd >= start && rd <= end && String(r.type).toLowerCase() === 'wfh';
       }).length;
-      setBlocked(count >= maxDays);
+      setBlocked(approvedCount >= maxDays);
     } else {
       setBlocked(false);
     }
@@ -101,16 +100,15 @@ const WfhRequestForm = ({ onSubmitted }) => {
     const { start, end } = getWeekBounds(date);
     const userId = user._id || user.id;
     const maxDays = user.wfhWeekly || 1;
-    const all = [...approved, ...pending];
-    const count = all.filter((r) => {
+    const approvedOnly = approved.filter((r) => {
       if (!r || !r.user) return false;
       const rid = r.user._id || r.user.id;
       if (rid !== userId) return false;
       const rd = new Date(r.date);
       return rd >= start && rd <= end && String(r.type).toLowerCase() === 'wfh';
     }).length;
-    if (count >= maxDays) {
-      setMessage(`You have reached your weekly WFH limit (${maxDays}). Current week: ${countsForWeek.pending} pending + ${countsForWeek.approved} approved = ${countsForWeek.all}.`);
+    if (approvedOnly >= maxDays) {
+      setMessage(`You have reached your weekly WFH approved limit (${maxDays}). Approved this week: ${countsForWeek.approved}.`);
       return;
     }
   }
