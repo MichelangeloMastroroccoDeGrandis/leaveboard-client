@@ -136,6 +136,31 @@ const WfhRequestForm = ({ onSubmitted }) => {
       setMessage(`You have reached your weekly WFH approved limit (${maxDays}). Approved this week: ${countsForWeek.approved}.`);
       return;
     }
+
+    try {
+      const [approvedRes, pendingRes] = await Promise.all([
+        axios.get(approvedUrl, { headers: { Authorization: `Bearer ${token}` } }),
+        axios.get(pendingUrl, { headers: { Authorization: `Bearer ${token}` } }),
+      ]);
+      const latestApproved = approvedRes.data || [];
+      const latestPending = pendingRes.data || [];
+      const sameDay = (r) => {
+        if (!r || !r.user) return false;
+        const rid = r.user._id || r.user.id;
+        if (rid !== userId) return false;
+        const rd = new Date(r.date);
+        const rdStr = new Date(rd.getTime() - rd.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
+        return rdStr === date && String(r.type).toLowerCase() === 'wfh';
+      };
+      const hasApprovedSameDay = latestApproved.some(sameDay);
+      const hasPendingSameDay = latestPending.some(sameDay);
+      if (hasApprovedSameDay || hasPendingSameDay) {
+        const status = hasApprovedSameDay ? 'approved' : 'pending';
+        setMessage(`You already have a ${status} WFH request on this date.`);
+        return;
+      }
+    } catch (_) {
+    }
   }
   try {
     const payload =
