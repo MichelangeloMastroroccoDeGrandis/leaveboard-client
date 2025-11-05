@@ -71,7 +71,32 @@ const WfhRequestForm = ({ onSubmitted }) => {
         const rd = new Date(r.date);
         return rd >= start && rd <= end && String(r.type).toLowerCase() === 'wfh';
       }).length;
-      setBlocked(approvedCount >= maxDays);
+
+      const sameDay = (r) => {
+        if (!r || !r.user) return false;
+        const rid = r.user._id || r.user.id;
+        if (rid !== userId) return false;
+        const rd = new Date(r.date);
+        const rdStr = new Date(rd.getTime() - rd.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
+        return rdStr === date && String(r.type).toLowerCase() === 'wfh';
+      };
+
+      const hasApprovedSameDay = approved.some(sameDay);
+      const hasPendingSameDay = pending.some(sameDay);
+
+      const limitBlocked = approvedCount >= maxDays;
+      const dateBlocked = hasApprovedSameDay || hasPendingSameDay;
+
+      setBlocked(limitBlocked || dateBlocked);
+
+      if (dateBlocked) {
+        const status = hasApprovedSameDay ? 'approved' : 'pending';
+        setMessage(`You already have a ${status} WFH request on this date.`);
+      } else if (limitBlocked) {
+        setMessage(`You have reached your weekly WFH approved limit (${maxDays}). Approved this week: ${countsForWeek.approved}.`);
+      } else {
+        setMessage(null);
+      }
     } else {
       setBlocked(false);
     }
@@ -143,7 +168,6 @@ const WfhRequestForm = ({ onSubmitted }) => {
       );
     }
   }
-
 
   return (
     <SectionWrap type="request">
