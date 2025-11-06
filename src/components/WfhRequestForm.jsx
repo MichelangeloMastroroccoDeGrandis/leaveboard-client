@@ -14,19 +14,20 @@ const WfhRequestForm = ({ onSubmitted }) => {
   const [approved, setApproved] = useState([]);
   const [pending, setPending] = useState([]);
   const [blocked, setBlocked] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
   const url = `${import.meta.env.VITE_BASE_URL}/api/wfh/request`;
   const approvedUrl = `${import.meta.env.VITE_BASE_URL}/api/wfh/approved`;
   const pendingUrl = `${import.meta.env.VITE_BASE_URL}/api/wfh/approvals`;
 
   useEffect(() => {
-  if (type === 'sick' && Array.isArray(date)) {
-    const diff = (new Date(date[1]) - new Date(date[0])) / (1000 * 60 * 60 * 24) + 1;
-    if (diff > 2) {
-      setMessage('📩 If your sick leave is longer than 2 days, please send a medical certificate to hr@digithaigroup.com');
+    if (type === 'sick' && Array.isArray(date)) {
+      const diff = (new Date(date[1]) - new Date(date[0])) / (1000 * 60 * 60 * 24) + 1;
+      if (diff > 2) {
+        setMessage('📩 If your sick leave is longer than 2 days, please send a medical certificate to hr@digithaigroup.com');
+      }
     }
-  }
-}, [type, date]);
+  }, [type, date]);
 
   // Fetch approved and pending requests to check user's weekly limit client-side
   useEffect(() => {
@@ -119,66 +120,71 @@ const WfhRequestForm = ({ onSubmitted }) => {
   })();
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
-  // Client-side check for weekly WFH limit (server also enforces)
-  if (type === 'wfh' && user && date) {
-    const { start, end } = getWeekBounds(date);
-    const userId = user._id || user.id;
-    const maxDays = user.wfhWeekly || 1;
-    const approvedOnly = approved.filter((r) => {
-      if (!r || !r.user) return false;
-      const rid = r.user._id || r.user.id;
-      if (rid !== userId) return false;
-      const rd = new Date(r.date);
-      return rd >= start && rd <= end && String(r.type).toLowerCase() === 'wfh';
-    }).length;
-    if (approvedOnly >= maxDays) {
-      setMessage(`You have reached your weekly WFH approved limit (${maxDays}). Approved this week: ${countsForWeek.approved}.`);
-      return;
-    }
-
-    try {
-      const [approvedRes, pendingRes] = await Promise.all([
-        axios.get(approvedUrl, { headers: { Authorization: `Bearer ${token}` } }),
-        axios.get(pendingUrl, { headers: { Authorization: `Bearer ${token}` } }),
-      ]);
-      const latestApproved = approvedRes.data || [];
-      const latestPending = pendingRes.data || [];
-      const sameDay = (r) => {
+    e.preventDefault();
+    if (submitting) return;
+    setSubmitting(true);
+    // Client-side check for weekly WFH limit (server also enforces)
+    if (type === 'wfh' && user && date) {
+      const { start, end } = getWeekBounds(date);
+      const userId = user._id || user.id;
+      const maxDays = user.wfhWeekly || 1;
+      const approvedOnly = approved.filter((r) => {
         if (!r || !r.user) return false;
         const rid = r.user._id || r.user.id;
         if (rid !== userId) return false;
         const rd = new Date(r.date);
-        const rdStr = new Date(rd.getTime() - rd.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
-        return rdStr === date && String(r.type).toLowerCase() === 'wfh';
-      };
-      const hasApprovedSameDay = latestApproved.some(sameDay);
-      const hasPendingSameDay = latestPending.some(sameDay);
-      if (hasApprovedSameDay || hasPendingSameDay) {
-        const status = hasApprovedSameDay ? 'approved' : 'pending';
-        setMessage(`You already have a ${status} WFH request on this date.`);
+        return rd >= start && rd <= end && String(r.type).toLowerCase() === 'wfh';
+      }).length;
+      if (approvedOnly >= maxDays) {
+        setMessage(`You have reached your weekly WFH approved limit (${maxDays}). Approved this week: ${countsForWeek.approved}.`);
+        setSubmitting(false);
         return;
       }
-    } catch (_) {
+
+      try {
+        const [approvedRes, pendingRes] = await Promise.all([
+          axios.get(approvedUrl, { headers: { Authorization: `Bearer ${token}` } }),
+          axios.get(pendingUrl, { headers: { Authorization: `Bearer ${token}` } }),
+        ]);
+        const latestApproved = approvedRes.data || [];
+        const latestPending = pendingRes.data || [];
+        const sameDay = (r) => {
+          if (!r || !r.user) return false;
+          const rid = r.user._id || r.user.id;
+          if (rid !== userId) return false;
+          const rd = new Date(r.date);
+          const rdStr = new Date(rd.getTime() - rd.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
+          return rdStr === date && String(r.type).toLowerCase() === 'wfh';
+        };
+        const hasApprovedSameDay = latestApproved.some(sameDay);
+        const hasPendingSameDay = latestPending.some(sameDay);
+        if (hasApprovedSameDay || hasPendingSameDay) {
+          const status = hasApprovedSameDay ? 'approved' : 'pending';
+          setMessage(`You already have a ${status} WFH request on this date.`);
+          setSubmitting(false);
+          return;
+        }
+      } catch (_) {
+      }
     }
-  }
-  try {
-    const payload =
-      type === 'timeoff'
-        ? { type, startDate, endDate }
-        : { type, date };
+    try {
+      const payload =
+        type === 'timeoff'
+          ? { type, startDate, endDate }
+          : { type, date };
 
-    const res = await axios.post(url, payload, {
-      headers: { Authorization: `Bearer ${token}` }
-    });
+      const res = await axios.post(url, payload, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
 
-    setMessage(res.data.message);
-    if (typeof onSubmitted === 'function') onSubmitted();
-    setTimeout(() => window.location.reload(), 1000);
-  } catch (err) {
-    setMessage(err.response?.data?.message || 'Error submitting request.');
-  }
-};
+      setMessage(res.data.message);
+      if (typeof onSubmitted === 'function') onSubmitted();
+      setTimeout(() => window.location.reload(), 1000);
+    } catch (err) {
+      setMessage(err.response?.data?.message || 'Error submitting request.');
+      setSubmitting(false);
+    }
+  };
 
   const datePickerBasedOnRequestType = () => {
     if (type === 'wfh' || type === 'sick') {
@@ -197,23 +203,23 @@ const WfhRequestForm = ({ onSubmitted }) => {
 
   return (
     <SectionWrap type="request">
-    <form className={styles.wfhRequestForm} onSubmit={handleSubmit} >
-      <h3>Request WFH</h3>
+      <form className={styles.wfhRequestForm} onSubmit={handleSubmit} >
+        <h3>Request WFH</h3>
 
-      <select value={type} onChange={(e) => setType(e.target.value)} >
-        <option value="wfh">Work From Home</option>
-        {/*<option value="sick">Sick Leave</option>
-        <option value="timeoff">Time Off</option> */}
-      </select>
+        <select value={type} onChange={(e) => setType(e.target.value)} >
+          <option value="wfh">Work From Home</option>
+          {/*<option value="sick">Sick Leave</option>
+          <option value="timeoff">Time Off</option> */}
+        </select>
 
-      {datePickerBasedOnRequestType()}
+        {datePickerBasedOnRequestType()}
 
-      <button type="submit" disabled={blocked} style={{ backgroundColor: blocked ? '#ccc' : undefined, cursor: blocked ? 'not-allowed' : 'pointer' }}>
-        Submit Request
-      </button>
+        <button type="submit" disabled={blocked || submitting} style={{ backgroundColor: (blocked || submitting) ? '#ccc' : undefined, cursor: (blocked || submitting) ? 'not-allowed' : 'pointer' }}>
+          Submit Request
+        </button>
 
-      {message && <p >{message}</p>}
-    </form>
+        {message && <p >{message}</p>}
+      </form>
     </SectionWrap>
   );
 };
