@@ -174,6 +174,7 @@ const WfhRequestForm = ({ onSubmitted }) => {
 
     setMessage(res.data.message);
     if (typeof onSubmitted === 'function') onSubmitted();
+    window.location.reload();
   } catch (err) {
     setMessage(err.response?.data?.message || 'Error submitting request.');
   }
