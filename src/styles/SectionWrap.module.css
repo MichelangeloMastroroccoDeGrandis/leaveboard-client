@@ -1,11 +1,12 @@
 .approval {
     display: flex;
     flex-direction: column;
-    align-items: left;
+    align-items: normal;
     justify-content: center;
     padding: 20px;
     width: auto;
-    margin: 0 1em
+    margin: 0 1em;
+    border-radius: var(--radius);
 }
 
 .request {
@@ -18,4 +19,5 @@
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     width: auto;
     max-width: 500px;
+    border-radius: var(--radius);
 }

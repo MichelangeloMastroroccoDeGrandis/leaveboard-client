@@ -2,3 +2,12 @@
     list-style-type: none;
     padding: 0;
 }
+
+.createWfhButton{ 
+    padding: 8px 12px; 
+    background: var(--blue);
+    color: var(--white);
+    border: none;
+    cursor: pointer;
+    border-radius: var(--button-radius);
+}

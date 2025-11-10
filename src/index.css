@@ -51,7 +51,7 @@ h6 {
 
 ::-webkit-scrollbar-thumb {
   background-color: var(--grey-dark);  /* Dark thumb */
-  border-radius: 5px;
+  border-radius: var(--button-radius);
 }
 
 /* Firefox */

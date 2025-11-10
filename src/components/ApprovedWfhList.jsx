@@ -24,6 +24,12 @@ const ApprovedWfhList = () => {
 
   const [requests, setRequests] = useState([]);
   const [refreshKey, setRefreshKey] = useState(0);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [allUsers, setAllUsers] = useState([]);
+  const [selectedUserId, setSelectedUserId] = useState('');
+  const [selectedDate, setSelectedDate] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+  const [loadingUsers, setLoadingUsers] = useState(false);
 
   useEffect(() => {
     dispatch(fetchApprovedRequests());
@@ -32,6 +38,28 @@ const ApprovedWfhList = () => {
   useEffect(() => {
     setRequests(approvedRequests);
   }, [approvedRequests]);
+
+  // Fetch users when opening the modal (admins/approvers only)
+  useEffect(() => {
+    const fetchUsers = async () => {
+      if (!isModalOpen || !['admin', 'approver'].includes(user?.role)) return;
+      try {
+        setLoadingUsers(true);
+        const token = localStorage.getItem('token');
+        const base = import.meta.env.VITE_BASE_URL;
+        const res = await fetch(`${base}/api/admin/users`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const data = await res.json();
+        setAllUsers(Array.isArray(data) ? data : []);
+      } catch (_) {
+        setAllUsers([]);
+      } finally {
+        setLoadingUsers(false);
+      }
+    };
+    fetchUsers();
+  }, [isModalOpen, user]);
 
   // Unified handleDelete for approved requests
   const handleDelete = async (id) => {
@@ -61,12 +89,25 @@ const today = formatDateLocal(new Date());
 
   return (
     <div>
-      <UserCalendar key={refreshKey} />
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12 }}>
+        <UserCalendar key={refreshKey} />
+      </div>
       <h2>Approved WFH Requests</h2>
+
+      {['admin', 'approver'].includes(user?.role) && (
+          <button
+            onClick={() => {
+              setIsModalOpen(true);
+            }}
+            className={styles.createWfhButton}
+          >
+            Create WFH
+          </button>
+        )}
       {loading && <p>Loading...</p>}
       {error && <p style={{ color: 'red' }}>{error}</p>}
       {!loading && approvedRequests.length === 0 && <p>No approved requests found.</p>}
-
+      
       <ul className={styles.approvedWfhList}>
         {requests.map((r, i) => {
           if(formatDateLocal(requests[i].date) > today) {
@@ -89,6 +130,86 @@ const today = formatDateLocal(new Date());
           }
         })}
       </ul>
+
+      {isModalOpen && (
+        <div
+          style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}
+          onClick={() => setIsModalOpen(false)}
+        >
+          <div
+            style={{ background: '#fff', padding: 20, borderRadius: 8, minWidth: 320, maxWidth: '90%' }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 style={{ marginTop: 0 }}>Create WFH (pending)</h3>
+            {loadingUsers ? (
+              <p>Loading users...</p>
+            ) : (
+              <>
+                <label style={{ display: 'block', marginBottom: 6 }}>User</label>
+                <select
+                  value={selectedUserId}
+                  onChange={(e) => setSelectedUserId(e.target.value)}
+                  style={{ width: '100%', padding: 8, marginBottom: 12 }}
+                >
+                  <option value="">Select a user</option>
+                  {allUsers
+                    .filter((u) => u._id !== user?._id)
+                    .map((u) => (
+                      <option key={u._id} value={u._id}>
+                        {u.name} ({u.role})
+                      </option>
+                    ))}
+                </select>
+
+                <label style={{ display: 'block', marginBottom: 6 }}>Date</label>
+                <input
+                  type="date"
+                  value={selectedDate}
+                  onChange={(e) => setSelectedDate(e.target.value)}
+                  style={{ width: '100%', padding: 8, marginBottom: 16 }}
+                />
+
+                <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
+                  <button
+                    onClick={() => setIsModalOpen(false)}
+                    disabled={submitting}
+                    style={{ padding: '8px 12px', background: '#ef4444', color: '#fff', border: 'none', cursor: 'pointer' }}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={async () => {
+                      if (!selectedUserId || !selectedDate) return alert('Select user and date');
+                      try {
+                        setSubmitting(true);
+                        const token = localStorage.getItem('token');
+                        await axios.post(
+                          `${API}/request`,
+                          { type: 'wfh', date: selectedDate, userId: selectedUserId, allowAnyDate: true },
+                          { headers: { Authorization: `Bearer ${token}` } }
+                        );
+                        alert('WFH request created as pending.');
+                        setIsModalOpen(false);
+                        setSelectedUserId('');
+                        setSelectedDate('');
+                        setRefreshKey((k) => k + 1);
+                      } catch (err) {
+                        alert(err.response?.data?.message || 'Failed to create request');
+                      } finally {
+                        setSubmitting(false);
+                      }
+                    }}
+                    disabled={submitting}
+                    style={{ padding: '8px 12px', background: '#16a34a', color: '#fff', border: 'none', cursor: 'pointer' }}
+                  >
+                    Submit
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 };

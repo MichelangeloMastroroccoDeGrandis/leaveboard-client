@@ -3,7 +3,7 @@
     color: var(--white);
     border: none;
     padding: 0.3em 1em;
-    border-radius: 4px;
+    border-radius: var(--button-radius);
 }
 
 .updatePassword {
@@ -12,7 +12,7 @@
     border: none;
     padding: 0.3em 1em;
     margin: 8px 0;
-    border-radius: 4px;
+    border-radius: var(--button-radius);
 }   
 
 .TableContainer {
