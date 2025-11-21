@@ -67,6 +67,12 @@ tr:hover td {
   color: var(--white);
 }
 
+.holiday {
+  background-color: var(--blue) !important;
+  border: 1px solid var(--white);
+  color: var(--white);
+}
+
 @media (max-width: 768px) {
   th, td {
     padding: 8px;

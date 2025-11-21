@@ -40,6 +40,7 @@ const SideBar = () => {
             <li><Link to="/" onClick={closeSidebar} className={`${styles.link} ${location.pathname === '/' ? styles.active : ''}`}>Dashboard</Link></li>
             <li><Link to="/approvals" onClick={closeSidebar} className={`${styles.link} ${location.pathname === '/approvals' ? styles.active : ''}`}>Approvals</Link></li>
             <li><Link to="/team" onClick={closeSidebar} className={`${styles.link} ${location.pathname === '/team' ? styles.active : ''}`}>Team</Link></li>
+            <li><Link to="/settings" onClick={closeSidebar} className={`${styles.link} ${location.pathname === '/settings' ? styles.active : ''}`}>Settings</Link></li>
             <li><a className={styles.logout} onClick={handleLogout} >Logout</a></li>
           </ul>
         )}
@@ -48,7 +49,8 @@ const SideBar = () => {
           <ul className={styles.sidebarList}>
             <li><Link to="/" onClick={closeSidebar} className={`${styles.link} ${location.pathname === '/' ? styles.active : ''}`}>Dashboard</Link></li>
             <li><Link to="/approvals" onClick={closeSidebar} className={`${styles.link} ${location.pathname === '/approvals' ? styles.active : ''}`}>Approvals</Link></li>
-             <li><a className={styles.logout} onClick={handleLogout} >Logout</a></li>
+            <li><Link to="/settings" onClick={closeSidebar} className={`${styles.link} ${location.pathname === '/settings' ? styles.active : ''}`}>Settings</Link></li>
+            <li><a className={styles.logout} onClick={handleLogout} >Logout</a></li>
           </ul>
         )}
 

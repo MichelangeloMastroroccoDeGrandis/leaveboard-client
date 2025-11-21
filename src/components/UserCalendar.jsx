@@ -4,6 +4,8 @@ import styles from '../styles/UserCalendar.module.css';
 const UserCalendar = ({ refreshKey = 0 }) => {
   const [users, setUsers] = useState([]);
   const [requests, setRequests] = useState([]);
+  const [holidays, setHolidays] = useState([]);
+  const [disallowedWeekdays, setDisallowedWeekdays] = useState([1, 5, 0, 6]); // default: Mon, Fri, weekend
   const token = localStorage.getItem('token');
 
   // Compute 4 weeks
@@ -33,18 +35,56 @@ const UserCalendar = ({ refreshKey = 0 }) => {
   const dates = getDates();
 
   const url = `${import.meta.env.VITE_BASE_URL}/api/calendar`;
+  const holidaysUrl = `${import.meta.env.VITE_BASE_URL}/api/holidays`;
+  const settingsUrl = `${import.meta.env.VITE_BASE_URL}/api/settings/wfh`;
 
   useEffect(() => {
-  const fetchData = async () => {
-    const res = await fetch(url, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    const data = await res.json();
-    setUsers(data.users);
-    setRequests(data.requests);
-  };
-  fetchData();
-}, [url, token, refreshKey]);
+    const fetchData = async () => {
+      try {
+        const [calRes, holRes, settingsRes] = await Promise.all([
+          fetch(url, {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+          fetch(holidaysUrl, {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+          fetch(settingsUrl, {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+        ]);
+
+        const calData = await calRes.json();
+        setUsers(calData.users || []);
+        setRequests(calData.requests || []);
+
+        if (holRes.ok) {
+          const holData = await holRes.json();
+          setHolidays(Array.isArray(holData) ? holData : []);
+        } else {
+          setHolidays([]);
+        }
+
+        if (settingsRes.ok) {
+          const settingsData = await settingsRes.json();
+          const serverDisallowed =
+            (settingsData && settingsData.disallowedWeekdays && settingsData.disallowedWeekdays.length)
+              ? settingsData.disallowedWeekdays
+              : [1, 5, 0, 6];
+          setDisallowedWeekdays(serverDisallowed.map((n) => Number(n)));
+        } else {
+          setDisallowedWeekdays([1, 5, 0, 6]);
+        }
+      } catch (e) {
+        setUsers([]);
+        setRequests([]);
+        setHolidays([]);
+        setDisallowedWeekdays([1, 5, 0, 6]);
+      }
+    };
+    if (token) {
+      fetchData();
+    }
+  }, [url, holidaysUrl, token, refreshKey]);
 
   const formatDate = (d) => d.toLocaleDateString('en-CA', { timeZone: 'Asia/Bangkok' });
 
@@ -53,7 +93,15 @@ const UserCalendar = ({ refreshKey = 0 }) => {
     const dayStr = formatDate(date);
     const key = `${userId}-${dayStr}`;
 
-    if (date.getDay() === 0 || date.getDay() === 6 || date.getDay() === 5) return <td key={key} className={styles.weekend}></td>;
+    const holiday = holidays.find((h) => h?.date === dayStr);
+
+    if (holiday) {
+      return <td key={key} className={styles.holiday}>{holiday.name || 'Holiday'}</td>;
+    }
+
+    if (disallowedWeekdays.includes(date.getDay())) {
+      return <td key={key} className={styles.weekend}></td>;
+    }
 
     const req = requests.find(
       (r) => r?.user?._id === userId && formatDate(new Date(r.date)) === dayStr

@@ -1,4 +1,8 @@
 .card {
+  display: flex;
+  justify-content: space-between;
+  flex-direction: row;
+  align-items: center;
   border: none;
   padding: 16px;
   margin-bottom: 16px;
@@ -9,6 +13,14 @@
 .card p {
   margin: 0.5em 0;
 }
+
+.card .name {
+  font-weight: bold;
+  font-size: 2em;
+  color: var(--blue);
+  margin: 0;
+}
+
 .card button {
   margin-right: 8px;
   padding: 6px 12px;

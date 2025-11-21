@@ -13,12 +13,16 @@ const WfhRequestForm = ({ onSubmitted }) => {
   const { token, user } = useSelector(state => state.auth);
   const [approved, setApproved] = useState([]);
   const [pending, setPending] = useState([]);
+  const [holidays, setHolidays] = useState([]);
+  const [disallowedWeekdays, setDisallowedWeekdays] = useState([1, 5, 0, 6]); // default: Monday, Friday, weekend
   const [blocked, setBlocked] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
   const url = `${import.meta.env.VITE_BASE_URL}/api/wfh/request`;
   const approvedUrl = `${import.meta.env.VITE_BASE_URL}/api/wfh/approved`;
   const pendingUrl = `${import.meta.env.VITE_BASE_URL}/api/wfh/approvals`;
+  const holidaysUrl = `${import.meta.env.VITE_BASE_URL}/api/holidays`;
+  const settingsUrl = `${import.meta.env.VITE_BASE_URL}/api/settings/wfh`;
 
   useEffect(() => {
     if (type === 'sick' && Array.isArray(date)) {
@@ -46,6 +50,41 @@ const WfhRequestForm = ({ onSubmitted }) => {
     if (token) fetchExisting();
   }, [approvedUrl, pendingUrl, token, date]);
 
+  // Fetch holidays so we can block WFH requests on public holidays client-side
+  useEffect(() => {
+    const fetchHolidays = async () => {
+      try {
+        const res = await axios.get(holidaysUrl, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setHolidays(Array.isArray(res.data) ? res.data : []);
+      } catch (_) {
+        setHolidays([]);
+      }
+    };
+    if (token) fetchHolidays();
+  }, [holidaysUrl, token]);
+
+  // Fetch WFH settings so we can respect dynamic disallowed weekdays client-side
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const res = await axios.get(settingsUrl, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const settings = res.data || null;
+        const serverDisallowed =
+          settings && Array.isArray(settings.disallowedWeekdays) && settings.disallowedWeekdays.length
+            ? settings.disallowedWeekdays
+            : [1, 5, 0, 6];
+        setDisallowedWeekdays(serverDisallowed.map((n) => Number(n)));
+      } catch (_) {
+        setDisallowedWeekdays([1, 5, 0, 6]);
+      }
+    };
+    if (token) fetchSettings();
+  }, [settingsUrl, token]);
+
   const getWeekBounds = (d) => {
     const dt = new Date(d);
     // Week starts Monday (1) and ends Sunday (0)
@@ -62,6 +101,48 @@ const WfhRequestForm = ({ onSubmitted }) => {
 
   useEffect(() => {
     if (type === 'wfh' && user && date) {
+      const selected = new Date(date);
+      const day = selected.getDay(); // 0 = Sun, 1 = Mon, 5 = Fri, 6 = Sat
+
+      // Block public holidays
+      const isHoliday = holidays.some((h) => h?.date === date);
+      if (isHoliday) {
+        setBlocked(true);
+        setMessage('WFH requests on public holidays are not allowed.');
+        return;
+      }
+
+      // Block weeks where holidays reduce weekly WFH allowance to 0
+      const { start: weekStart, end: weekEnd } = getWeekBounds(date);
+      const holidaysInWeek = holidays.filter((h) => {
+        if (!h?.date) return false;
+        const hd = new Date(h.date);
+        return hd >= weekStart && hd <= weekEnd;
+      }).length;
+
+      const baseMaxDays = user.wfhWeekly || 1;
+      const effectiveMaxDays = Math.max(0, baseMaxDays - holidaysInWeek);
+      if (effectiveMaxDays <= 0) {
+        setBlocked(true);
+        setMessage('No WFH allowed this week because of public holidays.');
+        return;
+      }
+
+      // Block days disallowed by WFH weekday rules (still show specific messages for common cases)
+      if (disallowedWeekdays.includes(day)) {
+        setBlocked(true);
+        if (day === 0 || day === 6) {
+          setMessage('WFH requests on weekends are not allowed.');
+        } else if (day === 1) {
+          setMessage('WFH requests on Mondays are not allowed.');
+        } else if (day === 5) {
+          setMessage('WFH requests on Fridays are not allowed.');
+        } else {
+          setMessage('WFH requests on this weekday are not allowed.');
+        }
+        return;
+      }
+
       const { start, end } = getWeekBounds(date);
       const userId = user._id || user.id;
       const maxDays = user.wfhWeekly || 1;
@@ -101,7 +182,7 @@ const WfhRequestForm = ({ onSubmitted }) => {
     } else {
       setBlocked(false);
     }
-  }, [type, user, date, approved, pending]);
+  }, [type, user, date, approved, pending, holidays, disallowedWeekdays]);
 
   const countsForWeek = (() => {
     if (!user || !date) return { approved: 0, pending: 0, all: 0 };

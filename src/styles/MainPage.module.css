@@ -12,3 +12,35 @@
   align-items: center;
   padding: 16px;
 }
+
+.rulesSection {
+  display: flex;
+    flex-direction: column;
+    align-items: left;
+    justify-content: center;
+    padding: 20px;
+    background-color: #f0f0f0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    width: 50%;
+    max-width: 500px;
+    border-radius: var(--radius);
+}
+
+.rulesSection ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.rulesSection li {
+    margin-bottom: 10px;
+}
+
+.conflict {
+  background-color: var(--yellow);
+  color: var(--black);
+  padding: 8px 12px;
+  border-radius: var(--radius);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}

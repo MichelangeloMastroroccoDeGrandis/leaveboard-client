@@ -140,7 +140,7 @@ const today = formatDateLocal(new Date());
             style={{ background: '#fff', padding: 20, borderRadius: 8, minWidth: 320, maxWidth: '90%' }}
             onClick={(e) => e.stopPropagation()}
           >
-            <h3 style={{ marginTop: 0 }}>Create WFH (pending)</h3>
+            <h3 style={{ marginTop: 0, color: 'var(--blue)' }}>Create WFH (pending)</h3>
             {loadingUsers ? (
               <p>Loading users...</p>
             ) : (
@@ -149,7 +149,7 @@ const today = formatDateLocal(new Date());
                 <select
                   value={selectedUserId}
                   onChange={(e) => setSelectedUserId(e.target.value)}
-                  style={{ width: '100%', padding: 8, marginBottom: 12 }}
+                  className={styles.modalInput}
                 >
                   <option value="">Select a user</option>
                   {allUsers
@@ -166,14 +166,14 @@ const today = formatDateLocal(new Date());
                   type="date"
                   value={selectedDate}
                   onChange={(e) => setSelectedDate(e.target.value)}
-                  style={{ width: '100%', padding: 8, marginBottom: 16 }}
+                  className={styles.modalInput}
                 />
 
-                <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
+                <div className={styles.modalActions}>
                   <button
                     onClick={() => setIsModalOpen(false)}
                     disabled={submitting}
-                    style={{ padding: '8px 12px', background: '#ef4444', color: '#fff', border: 'none', cursor: 'pointer' }}
+                    className={`${styles.modalButton} ${styles.modalCancelButton}`}
                   >
                     Cancel
                   </button>
@@ -200,7 +200,7 @@ const today = formatDateLocal(new Date());
                       }
                     }}
                     disabled={submitting}
-                    style={{ padding: '8px 12px', background: '#16a34a', color: '#fff', border: 'none', cursor: 'pointer' }}
+                    className={`${styles.modalButton} ${styles.modalSubmitButton}`}
                   >
                     Submit
                   </button>

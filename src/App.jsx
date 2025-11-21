@@ -11,6 +11,7 @@ import Company from './pages/Company';
 import ForgotPassword from './pages/ForgotPassword';
 import NotFound from './pages/NotFound';
 import AuthChecker from './hooks/authChecker';
+import SettingsPage from './pages/SettingsPage';
 
 function App() {
 
@@ -38,6 +39,10 @@ function App() {
 
         <Route element={<ProtectedRoute allowedRoles={['admin']} />}>
           <Route path="/company" element={<Company />} />
+        </Route>
+
+        <Route element={<ProtectedRoute allowedRoles={['admin', 'approver']} />}>
+          <Route path="/settings" element={<SettingsPage />} />
         </Route>
 
         <Route element={<ProtectedRoute allowedRoles={['user']} />}>

@@ -11,3 +11,41 @@
     cursor: pointer;
     border-radius: var(--button-radius);
 }
+
+.modalInput {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 12px;
+    border-radius: var(--button-radius);
+    border: 1px solid var(--grey-dark);
+    box-sizing: border-box;
+}
+
+.modalActions {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+    margin-top: 8px;
+}
+
+.modalButton {
+    padding: 8px 12px;
+    border: none;
+    border-radius: var(--button-radius);
+    cursor: pointer;
+}
+
+.modalCancelButton {
+    background: var(--red);
+    color: var(--white);
+}
+
+.modalSubmitButton {
+    background: var(--green);
+    color: var(--white);
+}
+
+.modalButton:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}

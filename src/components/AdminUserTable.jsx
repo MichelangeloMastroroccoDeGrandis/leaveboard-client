@@ -2,10 +2,12 @@
 import { useState } from 'react';
 import styles from '../styles/AdminUserTable.module.css';
 import { useSelector } from 'react-redux';
+import EditWfhModal from './EditWfhModal.jsx';
 
 const AdminUserTable = ({ users, refreshUsers }) => {
   const { user } = useSelector(state => state.auth);
-  const [passwords, setPasswords] = useState({});
+  const [isEditOpen, setIsEditOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
   const token = localStorage.getItem('token');
 
   const url = import.meta.env.VITE_BASE_URL;
@@ -52,6 +54,16 @@ const AdminUserTable = ({ users, refreshUsers }) => {
     }
   };
 
+  const openEdit = (u) => {
+    setSelectedUser(u);
+    setIsEditOpen(true);
+  };
+
+  const closeEdit = () => {
+    setIsEditOpen(false);
+    setSelectedUser(null);
+  };
+
   return (
     <div className={styles.TableContainer}>
       <h2>User Management</h2>
@@ -62,7 +74,6 @@ const AdminUserTable = ({ users, refreshUsers }) => {
             <th>Email</th>
             <th>Role</th>
             <th>Actions</th>
-            <th>Password</th>
           </tr>
         </thead>
         <tbody>
@@ -72,27 +83,32 @@ const AdminUserTable = ({ users, refreshUsers }) => {
               <td>{u.email}</td>
               <td>{u.role}</td>
               <td>
+                 <button
+                   onClick={() => openEdit(u)}
+                   className={styles.updatePassword}
+                 >
+                   Edit
+                 </button>
                  {user._id !== u._id && (
-                <button
-                  onClick={() => handleDelete(u._id)}
-                  className={styles.deleteButton}
-                >
-                  Delete
-                </button>
-                )}
-              </td>
-              <td>
-                <input type="text" value={passwords[u._id] || ''}
-                  onChange={(e) => handlePasswordChange(u._id, e.target.value)}
-                  placeholder="Change Password"
-                  
-                />
-                <button onClick={() => updatePassword(u._id)} className={styles.updatePassword}>Update</button>
+                   <button
+                     onClick={() => handleDelete(u._id)}
+                     className={styles.deleteButton}
+                   >
+                     Delete
+                   </button>
+                 )}
               </td>
             </tr>
           ))}
         </tbody>
       </table>
+      <EditWfhModal
+        isOpen={isEditOpen}
+        onClose={closeEdit}
+        user={selectedUser}
+        token={token}
+        onUpdated={refreshUsers}
+      />
     </div>
   );
 };
