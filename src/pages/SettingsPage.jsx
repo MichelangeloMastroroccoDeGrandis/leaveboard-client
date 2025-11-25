@@ -242,6 +242,9 @@ const SettingsPage = () => {
                           type="checkbox"
                           checked={!!wfhSettings.allowedDateScopes?.thisWeek}
                           onChange={() => handleScopeToggle('thisWeek')}
+                          style={{
+                            accentColor: 'var(--green)'
+                          }}
                         />{' '}
                         This week
                       </label>
@@ -250,6 +253,9 @@ const SettingsPage = () => {
                           type="checkbox"
                           checked={!!wfhSettings.allowedDateScopes?.nextWeek}
                           onChange={() => handleScopeToggle('nextWeek')}
+                          style={{
+                            accentColor: 'var(--green)'
+                          }}
                         />{' '}
                         Next week
                       </label>
@@ -258,6 +264,9 @@ const SettingsPage = () => {
                           type="checkbox"
                           checked={!!wfhSettings.allowedDateScopes?.withinMonth}
                           onChange={() => handleScopeToggle('withinMonth')}
+                          style={{
+                            accentColor: 'var(--green)'
+                          }}
                         />{' '}
                         Within current month
                       </label>
@@ -274,6 +283,9 @@ const SettingsPage = () => {
                               type="checkbox"
                               checked={disallowed.includes(weekday)}
                               onChange={() => handleWeekdayToggle(weekday)}
+                              style={{
+                                accentColor: 'var(--green)'
+                              }}
                             />{' '}
                             {label}
                           </label>
@@ -326,7 +338,7 @@ const SettingsPage = () => {
                         padding: '8px 12px',
                         borderRadius: 4,
                         border: 'none',
-                        backgroundColor: 'var(--blue)',
+                        backgroundColor: 'var(--green)',
                         color: 'white',
                         cursor: 'pointer',
                       }}
@@ -340,21 +352,7 @@ const SettingsPage = () => {
             )}
 
             {/* Holidays Management */}
-            <button
-              style={{
-                marginBottom: 16,
-                padding: '8px 12px',
-                borderRadius: 4,
-                border: 'none',
-                backgroundColor: 'var(--green)',
-                color: 'white',
-                cursor: 'pointer',
-              }}
-              onClick={openCreateModal}
-              disabled={loading}
-            >
-              + Add Public Holiday
-            </button>
+            
 
             {error && <p style={{ color: 'red' }}>{error}</p>}
 
@@ -416,6 +414,22 @@ const SettingsPage = () => {
                 </tbody>
               </table>
             )}
+            <button
+              style={{
+                marginBottom: 16,
+                padding: '8px 12px',
+                borderRadius: 4,
+                border: 'none',
+                backgroundColor: 'var(--blue)',
+                color: 'white',
+                cursor: 'pointer',
+                margin: '16px 0'
+              }}
+              onClick={openCreateModal}
+              disabled={loading}
+            >
+              + Add Public Holiday
+            </button>
           </>
         )}
 

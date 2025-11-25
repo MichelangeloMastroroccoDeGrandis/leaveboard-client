@@ -68,9 +68,9 @@ tr:hover td {
 }
 
 .holiday {
-  background-color: var(--blue) !important;
+  background-color: var(--grey-dark) !important;
   border: 1px solid var(--white);
-  color: var(--white);
+  color: var(--black);
 }
 
 @media (max-width: 768px) {
